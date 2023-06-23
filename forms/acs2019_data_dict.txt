@@ -1,0 +1,251 @@
+SEX
+Question: What is this person's sex?
+A. (code 1) Male
+B. (code 2) Female
+Answer:
+
+AGER
+Question: What is this person's age?
+A. (code 1) Under 5 years
+B. (code 2) 5 to 15 years
+C. (code 3) 16 to 30 years
+D. (code 4) 31 to 40 years
+E. (code 5) 41 to 50 years
+F. (code 6) 51 to 64 years
+G. (code 7) 65 years and over
+Answer:
+
+HISPR
+Question: Is this person of Hispanic, Latino, or Spanish origin?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+RAC1PR
+Question: What is this person's race?
+A. (code 1) White alone
+B. (code 2) Black or African American alone
+C. (code 3) American Indian or Alaska Native alone
+D. (code 4) Asian alone
+E. (code 5) Some other race alone
+F. (code 6) Two or more races
+Answer:
+
+NATIVITY
+Question: Where was this person born?
+A. (code 1) In the United States
+B. (code 2) Outside of the United States
+Answer:
+
+CIT
+Question: Is this person a citizen of the United States?
+A. (code 1) Yes, born in the United States
+B. (code 2) Yes, born in Puerto Rico, Guam, the U.S. Virgin Islands, or Northern Marianas
+C. (code 3) Yes, born abroad of U.S. citizen parent or parents
+D. (code 4) Yes, U.S. citizen by naturalization
+E. (code 5) No, not a U.S. citizen
+Answer:
+
+SCH
+Question: At any time in the last 3 months, has this person attended school or college?
+A. (code 1) No, has not attended in the last 3 months
+B. (code 2) Yes, public school, public college
+C. (code 3) Yes, private school, private college, home school
+Answer:
+
+SCHLR
+Question: What is this person's highest grade or level of school completed?
+A. (code 1) No schooling completed
+B. (code 2) Nursery or preschool through grade 12
+C. (code 3) High school graduate
+D. (code 4) College or some college
+E. (code 5) After bachelor's degree
+Answer:
+
+LANX
+Question: Does this person speak a language other than English at home?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+ENG
+Question: How well does this person speak English?
+A. (code 1) Very well
+B. (code 2) Well
+C. (code 3) Not well
+D. (code 4) Not at all
+Answer:
+
+HICOV
+Question: Is this person currently covered by any health insurance or health coverage plan?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DEAR
+Question: Is this person deaf or does he/she have serious difficulty hearing?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DEYE
+Question: Is this person blind or does he/she have serious difficulty seeing even when wearing glasses?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DREM
+Question: Because of a physical, mental, or emotional condition, does this person have serious difficulty concentrating, remembering, or making decisions?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DPHY
+Question: Does this person have serious difficulty walking or climbing stairs?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DDRS
+Question: Does this person have difficulty dressing or bathing?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+DOUT
+Question: Because of a physical, mental, or emotional condition, does this person have difficulty doing errands alone such as visiting a doctor's office or shopping?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+MAR
+Question: What is this person's marital status?
+A. (code 1) Now married
+B. (code 2) Widowed
+C. (code 3) Divorced
+D. (code 4) Separated
+E. (code 5) Never married
+Answer:
+
+FER
+Question: In the past 12 months, has this person given birth to any children?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+GCL
+Question: Does this person have any of his/her own grandchildren under the age of 18 living in this house or apartment?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+MIL
+Question: Has this person ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?
+A. (code 4) Never served in the military
+B. (code 3) Only on active duty for training in the Reserves or National Guard
+C. (code 1) Now on active duty
+D. (code 2) On active duty in the past, but not now
+Answer:
+
+WRK
+Question: Last week, did this person work for pay at a job (or business)?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+JWTRNS
+Question: How did this person usually get to work last week?
+A. (code 1) Car, truck, or van
+B. (code 2) Bus
+C. (code 3) Subway or elevated rail
+D. (code 4) Long-distance train or commuter rail
+E. (code 5) Light rail, streetcar, or trolley
+F. (code 6) Ferryboat
+G. (code 7) Taxicab
+H. (code 8) Motorcycle
+I. (code 9) Bicycle
+J. (code 10) Walked
+K. (code 11) Worked from home
+L. (code 12) Other method
+Answer:
+
+NWLA
+Question: Last week, was this person on layoff from a job?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+NWAB
+Question: Last week, was this person temporarily absent from a job or business?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+NWRE
+Question: Has this person been informed that he or she will be recalled to work within the next 6 months or been given a date to return to work?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+NWLK
+Question: During the last 4 week, has this person been actively looking for work?
+A. (code 1) Yes
+B. (code 2) No
+Answer:
+
+NWAV
+Question: Last week, could this person have started a job if offered one, or returned to work if recalled?
+A. (code 1) Yes, could have gone to work
+B. (code 2) No, because of own temporary illness
+C. (code 3) No, because of all other reasons (in school, etc.)
+Answer:
+
+WKL
+Question: When did this person last work, even for a few days?
+A. (code 1) Within the past 12 months
+B. (code 2) 1 to 5 years ago
+C. (code 3) Over 5 years ago or never worked
+Answer:
+
+WKWN
+Question: During the past 12 months (52 weeks), how many weeks did this person work? Include paid time off and include weeks when the person only worked for a few hours.
+A. (code 1) 0 weeks
+B. (code 2) 1 to 13 weeks
+C. (code 3) 14 to 26 weeks
+D. (code 4) 27 to 39 weeks
+E. (code 5) 40 to 47 weeks
+F. (code 6) 48 to 52 weeks
+Answer:
+
+WKHPR
+Question: During the past 12 months, in the weeks worked, how many hours did this person usually work each week?
+A. (code 1) Less than 10 hours per week
+B. (code 2) 10 to 19 hours per week
+C. (code 3) 20 to 34 hours per week
+D. (code 4) 35 to 44 hours per week
+E. (code 5) 45 to 59 hours per week
+F. (code 6) 60 or more hours per week
+Answer:
+
+COWR
+Question: Which one of the following best describes this person's employment last week or the most recent employment in the past 5 years?
+A. (code 1) For-profit company or organization
+B. (code 2) Non-profit organization
+C. (code 3) Local government
+D. (code 4) State government
+E. (code 5) Active duty U.S. Armed Forces or Commissioned Corps
+F. (code 6) Federal government civilian employee
+G. (code 7) Owner of non-incorporated business, professional practice, or farm
+H. (code 8) Owner of incorporated business, professional practice, or farm
+I. (code 9) Worked without pay in a for-profit family business or farm for 15 hours or more per week
+Answer:
+
+PINCPR
+Question: What was this person's total income during the past 12 months?
+A. (code 1) Loss
+B. (code 2) None
+C. (code 3) Less than $12,490
+D. (code 4) Between $12,490 and $52,000
+E. (code 5) Above $52,000
+Answer:
+
