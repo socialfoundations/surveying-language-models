@@ -1,4 +1,8 @@
-.DS_Store≈
+*.DS_Store
+.idea/
+.ipynb_checkpoints/
+*/__pycache__/
 venv/
 results/
 plots/
+__pycache__/

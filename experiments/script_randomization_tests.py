@@ -20,17 +20,13 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=10)
     parser.add_argument('--output_name', type=str, required=True)
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--move_tmp', action='store_true')  # faster loads in our internal cluster
 
     args = parser.parse_args()
     context_window = 1024 if 'gpt2' in args.model_dir else 2048
 
-    # If appropriate, move the model to /tmp for faster loads in our internal cluster
-    model_dir = move_tmp(args.model_dir) if args.move_tmp else args.model_dir
-
     # Load the model
-    print('Loading model...', model_dir)
-    tokenizer, model = load_tokenizer_model(model_dir)
+    print('Loading model...', args.model_dir)
+    tokenizer, model = load_tokenizer_model(args.model_dir)
 
     # Set the random seeds
     np.random.seed(args.seed)

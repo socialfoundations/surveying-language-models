@@ -82,7 +82,7 @@ class SingleTokenQ:
         """ Return the list of str of possible answers, e.g. ['A', 'B', 'C'] """
         raise NotImplementedError
 
-    def get_probs(self, tokenizer, last_word_probs):
+    def get_probs(self, tokenizer, last_word_probs, prefix=' '):
         """ Return the probabilities corresponding to each answer choice given the model's last-token probabilities
 
         Inputs
@@ -92,7 +92,7 @@ class SingleTokenQ:
         """
         assert len(last_word_probs.shape) == 1
         answers = self.get_completions()
-        answer_tokens = [tokenizer.encode(' ' + answer)[-1] for answer in answers]  # -1 since some tokenizers may prepend
+        answer_tokens = [tokenizer.encode(prefix + answer)[-1] for answer in answers]  # -1 since some tokenizers may prepend
         answer_probs = last_word_probs[answer_tokens]
         answer_probs /= answer_probs.sum()
         return np.array(answer_probs).flatten()
@@ -179,6 +179,32 @@ class MultipleChoiceQ(SingleTokenQ):
         text += 'Answer:'
         return text
 
+    def get_question_interview(self):
+        """ Construct the prompt for the language model """
+        text = 'Interviewer: ' + self.text + '\n'
+        for i, choice in enumerate(self.choices):
+            text += self.completions[i] + '. ' + choice.text + '\n'
+        text += 'Me:'
+        return text
+
+    def get_question_interview_perm(self, perm):
+        """ Construct the prompt for the language model """
+        text = 'Interviewer: ' + self.text + '\n'
+        choices = [self.choices[i] for i in perm]
+        for i, choice in enumerate(choices):
+            text += self.completions[i] + '. ' + choice.text + '\n'
+        text += 'Me:'
+        return text
+
+    def get_question_durmus(self, perm):
+        """ Construct the prompt for the language model """
+        text = 'User: ' + self.text + '\n\nHere are the options:\n'
+        choices = [self.choices[i] for i in perm]
+        for i, choice in enumerate(choices):
+            text += '(' + self.completions[i] + ') ' + choice.text + '\n'
+        text += '\nAssistant: If had to select one of the options, my answer would be ('
+        return text
+
     def get_question_permuted(self, perm):
         """ Construct the prompt, but from a set of choices different to those originally passed
 
@@ -206,6 +232,13 @@ class MultipleChoiceQ(SingleTokenQ):
         """ Returns as a string the question prompt + the answer choice """
         answer_text = self.get_answer_char() if self.has_been_answered() else ''
         return self.get_question() + answer_text + '\n\n'
+
+    def print_interview(self):
+        text = 'Interviewer: ' + self.text + '\n'
+        text += 'Me: '
+        assert self.has_been_answered(), 'Question has not been answered'
+        answer_text = self.choices[self.answer_id].text
+        return text + answer_text + '\n'
 
     def return_answer(self, force_answer=True):
         """ Returns the answer code, answer order, and char with which the choice was labelled , e.g. 1, 0, 'A'.
