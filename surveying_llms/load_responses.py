@@ -45,6 +45,10 @@ def process_naive(dataset, n_categories, isopenai=False):
     distributions = {}
     for _, row in dataset.iterrows():
         var = row['var']
+
+        if var not in n_categories:
+            continue
+
         p = np.array([row[str(i+1)] for i in range(n_categories[var])])
         if isopenai:
             p = openai_upper_bound(p, row['sp'], row['mlogp'])
@@ -111,12 +115,13 @@ def load_naive_responses(dir, models, n_categories, openai_models=None, ablation
             naive_responses[var][model] = response
     return naive_responses
 
-def load_adjusted_responses(dir, models, n_categories, openai_models=None, ablation=None):
+def load_adjusted_responses(dir, models, n_categories, openai_models=None, ablation=None, return_naive=False):
     print("Loading adjusted responses...")
     variables = n_categories.keys() if type(n_categories) == dict else n_categories
     ablation = '' if ablation is None else '_' + ablation
     choice_responses = {var: {} for var in variables}
     adjusted_responses = {var: {} for var in variables}
+    naive_responses = {var: {} for var in variables}
     for model in tqdm(models):
         for var in variables:
             results = pd.read_csv(dir + model + f"{ablation}_{var}.csv")
@@ -125,4 +130,17 @@ def load_adjusted_responses(dir, models, n_categories, openai_models=None, ablat
             choices_p, p = process_adjusted(results, n_cats, isopenai=isopenai)
             choice_responses[var][model] = choices_p
             adjusted_responses[var][model] = p
+
+            if return_naive:
+                # naive responses is the row that such that c0, ..., cN are 1, ..., N+1
+                row = results.iloc[0]
+
+                # Get the probabilities (in the order that they were presented)
+                p = row[[f'p{i}' for i in range(n_cats)]].to_numpy().reshape(-1)
+
+                assert p.size == n_cats
+                naive_responses[var][model] = p / p.sum()
+
+    if return_naive:
+        return choice_responses, adjusted_responses, naive_responses
     return choice_responses, adjusted_responses

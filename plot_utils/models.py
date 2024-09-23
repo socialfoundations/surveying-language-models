@@ -12,7 +12,8 @@ hf_models = [
 
 openai_models = [
     'ada', 'babbage', 'curie', 'davinci',
-    'text-davinci-001', 'text-davinci-002', 'text-davinci-003'
+    'text-davinci-001', 'text-davinci-002', 'text-davinci-003',
+    'gpt-4', 'gpt-3.5-turbo', 'gpt-4-turbo-preview',
 ]
 
 model_names = {
@@ -28,6 +29,7 @@ model_names = {
     'gptneox': 'GPT NeoX 20B', 'gptneoxchat': 'NeoXT Chat 20B',
     'ada': 'GPT3 2.7B', 'babbage': 'GPT3 6.7B', 'curie': 'GPT3 13B', 'davinci': 'GPT3 175B',
     'text-davinci-001': 'text-davinci-001', 'text-davinci-002': 'text-davinci-002', 'text-davinci-003': 'text-davinci-003',
+    'gpt-4': 'GPT-4 0613', 'gpt-3.5-turbo': 'GPT 3.5 Turbo 0613', 'gpt-4-turbo-preview': 'GPT-4 Turbo 0125',
     'uniform': 'Uniform\ndistribution', 'census': 'U.S. census'
 }
 
@@ -43,6 +45,7 @@ model_sizes = {  # in billions of parameters
     'gptneox': 20, 'gptneoxchat': 20,
     'ada': 2.7, 'babbage': 6.7, 'curie':13, 'davinci': 174.7,
     'text-davinci-001': 174.8, 'text-davinci-002': 174.9, 'text-davinci-003': 175,
+    'gpt-4': 178, 'gpt-3.5-turbo': 176, 'gpt-4-turbo-preview': 177,
     'census': 190, 'uniform': 190,  # such that they are always to the right in the plots
 }
 for key in model_sizes.keys():  # since parameter count is given in billions
@@ -57,4 +60,6 @@ instruct = {
     'llama2-7b-chat': 'llama2-7b', 'llama2-13b-chat': 'llama2-13b', 'llama2-70b-chat': 'llama2-70b',
     'gptneoxchat': 'gptneox',
     'text-davinci-001': 'davinci', 'text-davinci-002':'davinci', 'text-davinci-003': 'davinci',
+    'gpt-4': 'davinci', 'gpt-3.5-turbo': 'davinci',  # not correct
+    'gpt-4-turbo-preview': 'davinci'
 }

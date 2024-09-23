@@ -70,19 +70,21 @@ def load_acs_state_responses(census_file, n_categories):
     return states, responses_states
 
 
-def figure_1b(model_entropies, census_norm_entropies, base_models, model_sizes):
-    fig, ax = plt.subplots(1, 2, figsize=(4.6, 1.9), sharey=True)
+def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes):
+    _, ax = plt.subplots(1, 3, figsize=(5.5, 1.5), sharey=True)
 
     u = census_norm_entropies['SEX']
     ax[0].plot([1e7, 1e12], [u - 0.015, u - 0.015], c=gcolor)  # -0.015 to avoid overlap with uniform
-    u = census_norm_entropies['FER']
+    u = census_norm_entropies['HICOV']
     ax[1].plot([1e7, 1e12], [u, u], c=gcolor)
+    u = census_norm_entropies['FER']
+    ax[2].plot([1e7, 1e12], [u, u], c=gcolor)
 
     msize = 4
 
-    plot_vars = ['SEX', 'FER']
+    plot_vars = ['SEX', 'HICOV', 'FER']
     sizes = [model_sizes[m] for m in base_models]
-    for i in range(2):
+    for i in range(3):
         entropies = [model_entropies[plot_vars[i]][m] for m in base_models]
         ax[i].plot(sizes, entropies, 'D', c=bcolor, markersize=msize, zorder=10)
         ax[i].plot([1e7, 1e12], [1, 1], c=ocolor)  # uniform line
@@ -100,28 +102,33 @@ def figure_1b(model_entropies, census_norm_entropies, base_models, model_sizes):
         for spine in ax[i].spines.values():
             spine.set_edgecolor('0.3')
 
-    ax[0].set_ylabel('Entropy of\nmodel rresponses', fontsize=12)
-    ax[0].set_title('SEX question')
-    ax[1].set_title('FER question')
+    # ax[0].set_ylabel('Entropy of\nmodel rresponses', fontsize=12)
+    ax[0].set_ylabel('Response entropy', fontsize=12, labelpad=5, y=0.5)
+
+    ax[0].set_title('SEX')
+    ax[1].set_title('HICOV')
+    ax[2].set_title('FER')
 
     legend_elements = []
     legend_elements.append(plt.Line2D([0], [0], marker='D', color=bcolor,
-                                      label='Model', markersize=msize + 1,
-                                      markerfacecolor=bcolor, lw=0))
+                                    label='Model', markersize=msize + 1,
+                                    markerfacecolor=bcolor, lw=0))
     legend_elements.append(plt.Line2D([0], [0], color=gcolor,
-                                      label='U.S. census', markersize=msize + 1,
-                                      markerfacecolor=gcolor, lw=2))
+                                    label='U.S. census', markersize=msize + 1,
+                                    markerfacecolor=gcolor, lw=2))
     legend_elements.append(plt.Line2D([0], [0], color=ocolor,
-                                      label='Uniform distribution', markersize=msize + 1,
-                                      markerfacecolor=ocolor, lw=2))
-    legend_position = (-0.25, -0.3)
+                                    label='Uniform distribution', markersize=msize + 1,
+                                    markerfacecolor=ocolor, lw=2))
+    legend_position = (-0.64, -0.38)
     ax[-1].legend(handles=legend_elements, loc='upper center',
-                  bbox_to_anchor=legend_position, frameon=False, ncols=3, fontsize=10.5, columnspacing=1.1)
+                bbox_to_anchor=legend_position, frameon=False, ncols=3, 
+    #               handletextpad=0.8,
+                fontsize=10.5, columnspacing=1.1,)
 
     plt.subplots_adjust(wspace=0.1)
 
-def plot_a_bias(a_bias, base_models, model_names, alpha=0.4):
-    fig, ax = plt.subplots(figsize=(9, 1.5))
+def plot_a_bias(a_bias, base_models, model_names, alpha=0.4, figsize=(9, 1.5)):
+    fig, ax = plt.subplots(figsize=figsize)
 
     # plot the a-bias of each model
     for i, model in enumerate(base_models):
@@ -134,7 +141,7 @@ def plot_a_bias(a_bias, base_models, model_names, alpha=0.4):
     legend_elements.append(plt.Line2D([0], [0], marker='.', color=bcolor,
                                       label='Survey question', markersize=11,
                                       markerfacecolor=bcolor, lw=0))
-    legend_position = (1.0, 1.27)  # Coordinates (x, y) for top left position
+    legend_position = (1.0, 1.2)  # Coordinates (x, y) for top left position
     ax.legend(handles=legend_elements, loc='upper right',
               bbox_to_anchor=legend_position, frameon=False, ncols=3, handletextpad=.6, )
 
@@ -158,33 +165,8 @@ def plot_a_bias(a_bias, base_models, model_names, alpha=0.4):
     ax.set_ylabel('A-bias', fontsize=12)
     ax.tick_params(axis='y', which='both', labelsize=10)
 
-def plot_abias_vs_entropy(mean_entropy, mean_ordering_bias):
-    fig, ax = plt.subplots(figsize=(1.8, 1.4))
-
-    # abias vs entropy
-    ax.plot(mean_entropy, mean_ordering_bias, 'D', c=bcolor, markersize=4)
-
-    # legend
-    legend_elements = []
-    legend_elements.append(plt.Line2D([0], [0], marker='D', color=bcolor,
-                                      label='Model $m$', markersize=4,
-                                      markerfacecolor=bcolor, lw=0))
-    legend_position = (1.05, 1.27)  # Coordinates (x, y) for top left position
-    ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, handletextpad=-0.1, ncols=3, columnspacing=-0.7)
-
-    ax.xaxis.set_ticks_position('none')
-    ax.yaxis.set_ticks_position('none')
-
-    ax.set_ylim([0, 0.6])
-    ax.grid()
-
-    ax.set_xlabel('Mean response entropy\n', fontsize=11)
-    ax.set_ylabel('Mean A-bias', fontsize=11)
-    ax.yaxis.set_label_coords(-0.25, 0.47)
-
-
-def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_names, figsize, alpha=0.4):
+def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_names, figsize, 
+                          alpha=0.4, ylegend=1.2):
     fig, ax = plt.subplots(figsize=figsize)
 
     # plot the entropy of each model
@@ -207,7 +189,8 @@ def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_
     legend_elements.append(plt.Line2D([0], [0], marker='.', color=gcolor,
                                       label='Survey question', markersize=14,
                                       markerfacecolor=gcolor, lw=0))
-    legend_position = (1.015, 1.3)  # Coordinates (x, y) for top left position
+#     legend_position = (1.015, 1.3)  # Coordinates (x, y) for top left position
+    legend_position = (1.015, ylegend)  # Coordinates (x, y) for top left position
     ax.legend(handles=legend_elements, loc='upper right',
               bbox_to_anchor=legend_position, frameon=False, handletextpad=-0.1, ncols=2, columnspacing=-0.7)
 
@@ -219,7 +202,7 @@ def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_
         label.set_transform(label.get_transform() + offset)
     labels = [model_names[m] for m in models]
     if census_entropies is not None:
-        labels.append('census')
+        labels.append('U.S. Census')
     ax.set_xticks([i for i in range(len(labels))])
     ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
     ax.set_yticks([0.0, 0.5, 1.0])
@@ -232,59 +215,14 @@ def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_
     ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.set_axisbelow(True)
     ax.set_ylim([0, 1.1])
-    ax.set_ylabel('Entropy of\nresponses', fontsize=12, labelpad=5, y=0.5)
+    ax.set_ylabel('Response entropy', fontsize=12, labelpad=5, y=0.5)
 
-
-def plot_kl_unif_census(models, adjusted_kl_census, adjusted_kl_uniform, variables, model_names, alpha=0.6, ymax=4):
-    assert len(models) == 6
-
-    fig, axs = plt.subplots(2, 3, figsize=(4.2, 2.5), sharex=True, sharey=True)
-
-    for i in range(3):
-        for j in range(2):
-            m = models[i + j * 3]
-            ax = axs[j, i]
-            xaxis = [adjusted_kl_census[v][m] for v in variables]
-            yaxis = [adjusted_kl_uniform[v][m] for v in variables]
-
-            ax.plot(xaxis, yaxis, '.', c=bcolor, alpha=alpha, markersize=8)
-            ax.set_title(model_names[m], fontsize=10)
-            ax.grid()
-            ax.yaxis.set_ticks_position('none')
-            ax.xaxis.set_ticks_position('none')
-
-            ax.set_xticks([i for i in range(ymax+1)])
-            ax.set_yticks([i for i in range(ymax+1)])
-
-            ax.plot([0, ymax], [0, ymax], ls="-", c=".75", linewidth=0.4, zorder=-10)
-
-            for spine in ax.spines.values():
-                spine.set_edgecolor('0.3')
-
-
-    ax.set_ylim([-.1, ymax])
-    ax.set_xlim([-.1, ymax])
-
-    plt.tight_layout(h_pad=0.2)
-    ax = fig.add_subplot(111, frameon=False)
-
-    legend_elements = []
-    legend_elements.append((plt.Line2D([0], [0], marker='.', color=bcolor, alpha=1,
-                                       label=r'Survey question', markersize=11,
-                                       markerfacecolor=bcolor, lw=0)))
-    legend_position = (1.04, 1.3)  # Coordinates (x, y) for top left position
-    ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, handletextpad=0.5, ncols=3, columnspacing=0.9)
-
-    # hide tick and tick label of the big axis
-    plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-    plt.xlabel("KL(model || census)", fontsize=11)
-    plt.ylabel("KL(model || uniform)", fontsize=11, y=.5, labelpad=-3)
-
-def plot_divergence_subgroups(divergence, divergence_uniform, selected_models, model_names, alpha=0.1,
+def plot_divergence_subgroups(divergence, divergence_uniform, divergence_census,
+                              selected_models, model_names, alpha=0.1,
                               ylim=[-0.1, 2.], yticks=[0., 0.5, 1., 1.5, 2.],
-                              ylabel=r'$\bar\mathrm{KL}$(model, subgroup)', clabel='Census subgroup'):
-    fig, ax = plt.subplots(figsize=(11, 1.5))
+                              ylabel=r'$\bar\mathrm{KL}$(model, Ref.)', clabel='Census subgroup',
+                              figsize=(13, 1.5)):
+    fig, ax = plt.subplots(figsize=figsize)
 
     # divergence for each model
     for i, model in enumerate(selected_models):
@@ -292,18 +230,25 @@ def plot_divergence_subgroups(divergence, divergence_uniform, selected_models, m
         xs = [i for _ in ys]
         ax.plot(xs, ys, '.', c=bcolor, alpha=alpha, markersize=12)
         ax.plot(i, divergence_uniform[model], '*', c=rcolor, markersize=9)
+        
+        # plot the mean similarity
+        ax.scatter(i, divergence_census[model],marker='x', color='k', s=50, linewidth=2, zorder=100)
+        
 
     # legend
-    legend_elements = []
-    legend_elements.append(plt.Line2D([0], [0], marker='o', color=bcolor,
-                                      label='Census subgroup', markersize=6,
-                                      markerfacecolor=bcolor, lw=0))
-    legend_elements.append(plt.Line2D([0], [0], marker='*', color=rcolor,
-                                      label='Uniformly random responses', markersize=9,
-                                      markerfacecolor=rcolor, lw=0))
-    legend_position = (1.01, 1.32)  # Coordinates (x, y) for top left position
-    ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, handletextpad=0.4, ncols=4, fontsize=10.5)
+#     legend_elements = []
+#     legend_elements.append(plt.Line2D([0], [0], marker='o', color=bcolor,
+#                                       label='U.S. state populations', markersize=6,
+#                                       markerfacecolor=bcolor, lw=0))
+#     legend_elements.append(plt.Line2D([0], [0], marker='x', color='k',
+#                                       label='Entire U.S. census', markersize=7,
+#                                       markerfacecolor='k', lw=0))
+#     legend_elements.append(plt.Line2D([0], [0], marker='*', color=rcolor,
+#                                       label='Uniform responses', markersize=9,
+#                                       markerfacecolor=rcolor, lw=0))
+#     legend_position = (1.01, 1.32)  # Coordinates (x, y) for top left position
+#     ax.legend(handles=legend_elements, loc='upper right',
+#               bbox_to_anchor=legend_position, frameon=False, handletextpad=0.4, ncols=4, fontsize=10.5)
 
     # x-ticks
     dx = 0.2;
@@ -316,7 +261,7 @@ def plot_divergence_subgroups(divergence, divergence_uniform, selected_models, m
     ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
 
     ax.set_xlim([-0.4, len(selected_models) - 0.5])
-    ax.set_ylim(ylim)
+#     ax.set_ylim(ylim)
     ax.set_yticks(yticks)
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
@@ -324,10 +269,31 @@ def plot_divergence_subgroups(divergence, divergence_uniform, selected_models, m
     ax.set_ylabel(ylabel, fontsize=12)
     ax.tick_params(axis='y', which='both', labelsize=10)
 
-def plot_discriminator(accuracies, models, model_names, title="Accuracy in discriminating model-generated data"):
-    fig, ax = plt.subplots(figsize=(10.5, 1.2))
-    plt.plot([i for i, _ in enumerate(models)], [np.mean(accuracies[model]) * 100 for model in models],
-             'X', color=bcolor, alpha=0.9)
+
+def plot_discriminator(accuracies, accuracies2, models, model_names, 
+                       title="Accuracy in discriminating model-generated data", 
+                       figsize=(10.5, 1.2), legendx=1.0,
+                       mean_s=None, upper_s=None, lower_s=None):
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    xs = [i - 0.15 for i, _ in enumerate(models)]
+    ys = [np.mean(accuracies[model]) * 100 for model in models]
+    es = [np.std(accuracies[model]) * 2 * 100 for model in models]
+    print(es)
+    plt.plot(xs, ys, 'X', color=bcolor, alpha=0.9)
+    plt.errorbar(xs, ys, yerr=es, color=bcolor, fmt='.', capsize=2)
+    
+    if accuracies2 is not None:
+        xs = [i + 0.15 for i, _ in enumerate(models)]
+        ys = [np.mean(accuracies2[model]) * 100 for model in models]
+        es = [np.std(accuracies2[model]) * 2 * 100 for model in models]
+        plt.plot(xs, ys, 'X', color=ocolor, alpha=0.9)
+        plt.errorbar(xs, ys, yerr=es, color=ocolor, fmt='.', capsize=2)
+    
+    # plot mean across states
+    if mean_s is not None:
+        plt.plot([-1, len(models)], [mean_s, mean_s], c=gcolor)
+        plt.fill_between([-1, len(models)], [lower_s, lower_s], [upper_s, upper_s], alpha=0.3, color=gcolor)
 
     dx = 0.2;
     dy = 0.05
@@ -337,68 +303,223 @@ def plot_discriminator(accuracies, models, model_names, title="Accuracy in discr
     ax.set_xticks([i for i in range(len(models))])
     labels = [model_names[m] for m in models]
     ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
+    ax.set_yticks([50, 60, 70, 80, 90, 100])
 
     ax.set_xlim([-0.5, len(models) - 0.5])
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=100)
     ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.set_axisbelow(True)
-    ax.set_ylim([95, 100])
+    ax.set_ylim([97.5, 100.2])
     ax.set_ylabel('Accuracy (%)', fontsize=11)
     ax.tick_params(axis='y', which='both', labelsize=10.5)
 
     ax.xaxis.set_ticks_position('none')
     ax.yaxis.set_ticks_position('none')
 
-    ax.set_title(title, fontsize=11)
+    legend_elements = []
+
+    if accuracies2 is not None:
+        legend_elements.append(plt.Line2D([0], [0], marker='X', color=bcolor,
+                                        label='With choice randomization', markersize=6,
+                                        markerfacecolor=bcolor, lw=0))
+        legend_elements.append(plt.Line2D([0], [0], marker='X', color=ocolor,
+                                        label='Without choice randomization', markersize=6,
+                                        markerfacecolor=ocolor, lw=0))
+        legend_position = (legendx, 1.41)  # Coordinates (x, y) for top left position
+        l1 = plt.legend(handles=legend_elements, loc='upper right',
+                bbox_to_anchor=legend_position, frameon=False, ncols=2, handletextpad=0, columnspacing=0.7)
+    
+    if mean_s is not None:
+        legend_elements = []
+        legend_elements.append(plt.Line2D([0], [0], color=gcolor, 
+            label='Discriminating between any U.S. state and rest of ACS census',
+                        markersize=6, markerfacecolor=gcolor, lw=2))
+        legend_position = (legendx+0.02, 1.26)  # Coordinates (x, y) for top left position
+        l2 = plt.legend(handles=legend_elements, loc='upper right',
+                bbox_to_anchor=legend_position, frameon=False, ncols=2, columnspacing=0.7)
+    
+    if accuracies2 is not None:
+        ax.add_artist(l1)
+
+    if mean_s is not None:
+        ax.add_artist(l2)
+    
+    ax.set_title(title, fontsize=11, y=1.32)
 
 
-def plot_similarity_opinions(states, subgroup_alignment, alignment_uniform, models, model_names,
-                             xlabel, ylabel, title):
-    fig, ax = plt.subplots(figsize=(2.9, 2.4))
+def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent, models, model_names,
+                             xlabel='Entropy of subgroup\'s (U.S. state) responses', 
+                             ylabel=r'$\bar{\mathrm{KL}}$(model, subgroup)',
+                             title1='Unadjusted responses', title2='Adjusted responses',
+                             figsize=(5.5, 2.5)):
+    from matplotlib.legend_handler import HandlerTuple, HandlerLine2D
+    fig, axs = plt.subplots(1, 2, figsize=figsize, sharey=True, sharex=True)
 
+    ax = axs[0]
     p = sb.color_palette("colorblind")
 
-    xaxis = alignment_uniform
+    # xaxis = list([subgroup_unif_mean[s] for s in states])
+    xaxis = list([subgroup_ent[s] for s in states])
     x_range = [min(xaxis), max(xaxis)]
     for c, m in zip(p, models):
-        yaxis = [subgroup_alignment[m][s] for s in states]
+        yaxis = [divergence_unadj[m][s] for s in states]
+        ax.plot(xaxis, yaxis, '.', c=c, markersize=7, alpha=0.4, zorder=-10)
+        f = np.poly1d(np.polyfit(xaxis, yaxis, 1))
+        ax.plot(x_range, f(x_range), '', c=c, linewidth=2.)
+
+    ax.set_ylabel(ylabel, fontsize=12)
+    ax.set_title(title1)
+    ax.xaxis.set_ticks_position('none')
+    ax.grid()
+
+    ax = axs[1]
+    p = sb.color_palette("colorblind")
+
+    # xaxis = list(subgroup_unif_mean.values())
+    x_range = [min(xaxis), max(xaxis)]
+    for c, m in zip(p, models):
+        yaxis = [divergence[m][s] for s in states]
         ax.plot(xaxis, yaxis, '.', c=c, markersize=7, alpha=0.4, zorder=-10)
         f = np.poly1d(np.polyfit(xaxis, yaxis, 1))
         ax.plot(x_range, f(x_range), '', c=c, linewidth=2.)
 
     # Legend
     legend_elements = []
-    legend_elements.append(plt.Line2D([0], [0], color='k', marker='.',
-                                      label='', markersize=8, alpha=0,
-                                      markerfacecolor='k', lw=0))
-    legend_elements.append(plt.Line2D([0], [0], color='k', alpha=0.,
-                                      label='', markersize=11,
-                                      markerfacecolor='k', lw=2))
+    labels_= []
 
-    for c, m in zip(p, models):
-        legend_elements.append(plt.Line2D([0], [0], color=c, marker='.',
-                                          label='', markersize=8,
-                                          markerfacecolor=c, lw=0))
     legend_elements.append(plt.Line2D([0], [0], color='k', marker='.',
-                                      label='Subgroup', markersize=9, alpha=0.7,
+                                      markersize=9, alpha=0.7,
                                       markerfacecolor='k', lw=0))
+    labels_.append('Subgroup')
     legend_elements.append(plt.Line2D([0], [0], color='k', alpha=0.7,
-                                      label='Trendline', markersize=11,
+                                      markersize=11,
                                       markerfacecolor='k', lw=3))
+    labels_.append('Trendline')
 
+    legend_elements.append(plt.Line2D([0], [0], color='w', alpha=0.7,
+                                      markersize=11,
+                                      markerfacecolor='w', lw=3))
+    labels_.append('')
+
+    # lines with the names
     for c, m in zip(p, models):
-        legend_elements.append(plt.Line2D([0], [0], color=c,
-                                          label=model_names[m], markersize=11,
-                                          markerfacecolor=c, lw=2))
+        # dots
+        dot = plt.Line2D([0], [0], color=c, marker='.',
+                         label='', markersize=8,
+                         markerfacecolor=c, lw=0)
 
-    legend_position = (1.93, 1.16)  # Coordinates (x, y) for top left position
-    ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, ncols=2, handletextpad=.8, columnspacing=-1.)
+        # line 
+        line = plt.Line2D([0], [0], color=c, 
+                          markersize=11, markerfacecolor=c, lw=2)
 
-    ax.set_ylabel(ylabel, fontsize=12)
+        legend_elements.append((dot, line))
+        labels_.append(model_names[m])
+
+
+    legend_labels = [(line, line), (line, line)]
+    legend = ax.legend(legend_labels, ['Combined Data 1', 'Combined Data 2'], 
+                       handler_map={tuple: HandlerTuple(ndivide=None)})
+
+    legend_position = (1.08, -.2)  # Coordinates (x, y) for top left position
+    ax.legend(legend_elements, labels_, loc='upper right',
+              bbox_to_anchor=legend_position, frameon=False, ncols=3, handletextpad=.8, columnspacing=0.7,
+              handler_map={tuple: HandlerTuple(ndivide=None), 
+                           type(line): HandlerLine2D()})
+
     ax.set_xlabel(xlabel, fontsize=11.8)
-    ax.set_title(title)
-    ax.yaxis.set_label_coords(-0.2, 0.45)
+    ax.set_title(title2)
     ax.xaxis.set_ticks_position('none')
     ax.yaxis.set_ticks_position('none')
+    ax.xaxis.set_label_coords(-0.1, -.14)
     ax.grid()
+
+    plt.subplots_adjust(wspace=0.05)
+
+
+def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent, models, model_names,
+                             xlabel='Entropy of subgroup\'s (U.S. state) responses', 
+                             ylabel=r"$\bar{\mathrm{KL}}$(model, subgroup)",
+                             title1='Unadjusted responses', title2='Adjusted responses',
+                             figsize=(5.5, 2.5)):
+    from matplotlib.legend_handler import HandlerTuple, HandlerLine2D
+    fig, axs = plt.subplots(1, 2, figsize=figsize, sharey=True, sharex=True)
+
+    ax = axs[0]
+    p = sb.color_palette("colorblind")
+
+    # xaxis = list([subgroup_unif_mean[s] for s in states])
+    xaxis = list([subgroup_ent[s] for s in states])
+    x_range = [min(xaxis), max(xaxis)]
+    for c, m in zip(p, models):
+        yaxis = [divergence_unadj[m][s] for s in states]
+        ax.plot(xaxis, yaxis, '.', c=c, markersize=7, alpha=0.4, zorder=-10)
+        f = np.poly1d(np.polyfit(xaxis, yaxis, 1))
+        ax.plot(x_range, f(x_range), '', c=c, linewidth=2.)
+
+    ax.set_ylabel(ylabel, fontsize=12)
+    ax.set_title(title1)
+    ax.xaxis.set_ticks_position('none')
+    ax.grid()
+
+    ax = axs[1]
+    p = sb.color_palette("colorblind")
+
+    # xaxis = list(subgroup_unif_mean.values())
+    x_range = [min(xaxis), max(xaxis)]
+    for c, m in zip(p, models):
+        yaxis = [divergence[m][s] for s in states]
+        ax.plot(xaxis, yaxis, '.', c=c, markersize=7, alpha=0.4, zorder=-10)
+        f = np.poly1d(np.polyfit(xaxis, yaxis, 1))
+        ax.plot(x_range, f(x_range), '', c=c, linewidth=2.)
+
+    # Legend
+    legend_elements = []
+    labels_= []
+
+    legend_elements.append(plt.Line2D([0], [0], color='k', marker='.',
+                                      markersize=9, alpha=0.7,
+                                      markerfacecolor='k', lw=0))
+    labels_.append('Subgroup')
+    legend_elements.append(plt.Line2D([0], [0], color='k', alpha=0.7,
+                                      markersize=11,
+                                      markerfacecolor='k', lw=3))
+    labels_.append('Trendline')
+
+    legend_elements.append(plt.Line2D([0], [0], color='w', alpha=0.7,
+                                      markersize=11,
+                                      markerfacecolor='w', lw=3))
+    labels_.append('')
+
+    # lines with the names
+    for c, m in zip(p, models):
+        # dots
+        dot = plt.Line2D([0], [0], color=c, marker='.',
+                         label='', markersize=8,
+                         markerfacecolor=c, lw=0)
+
+        # line 
+        line = plt.Line2D([0], [0], color=c, 
+                          markersize=11, markerfacecolor=c, lw=2)
+
+        legend_elements.append((dot, line))
+        labels_.append(model_names[m])
+
+
+    legend_labels = [(line, line), (line, line)]
+    legend = ax.legend(legend_labels, ['Combined Data 1', 'Combined Data 2'], 
+                       handler_map={tuple: HandlerTuple(ndivide=None)})
+
+    legend_position = (1.08, -.2)  # Coordinates (x, y) for top left position
+    ax.legend(legend_elements, labels_, loc='upper right',
+              bbox_to_anchor=legend_position, frameon=False, ncols=3, handletextpad=.8, columnspacing=0.7,
+              handler_map={tuple: HandlerTuple(ndivide=None), 
+                           type(line): HandlerLine2D()})
+
+    ax.set_xlabel(xlabel, fontsize=11.8)
+    ax.set_title(title2)
+    ax.xaxis.set_ticks_position('none')
+    ax.yaxis.set_ticks_position('none')
+    ax.xaxis.set_label_coords(-0.1, -.14)
+    ax.grid()
+
+    plt.subplots_adjust(wspace=0.05)
