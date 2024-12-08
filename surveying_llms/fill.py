@@ -68,11 +68,51 @@ def fill_naive(form, tokenizer, model, batch_size, context_size, save_dir):
     choice_df.to_csv(save_dir + '_naive.csv', index=False)
 
 
-def fill_adjusted(form, tokenizer, model, batch_size, context_size, save_dir, max_perms=5000, prompt=None):
+def fill_adjusted(form, tokenizer, model, batch_size, context_size, save_dir, max_perms=5000):
     """ Adjust for randomized choice ordering, questions are asked individually """
     context = form.context
 
-    assert (prompt is None) or (prompt in ['interview', 'durmus'])
+    q = form.first_q
+    while q != 'end':
+        # print(q)
+        question = form.questions[q]
+
+        # Get the permutations to be evaluated
+        n_choices = question.get_n_choices()
+        indices = [i for i in range(n_choices)]
+        if math.factorial(n_choices) <= max_perms:  # enumerate all permutations
+            permutations = list(itertools.permutations(indices))
+        else:  # sample permutations
+            permutations = [np.random.permutation(indices) for _ in range(max_perms)]
+
+        choice_codes = [question.get_choices_permuted(perm) for perm in permutations]
+
+        i = 0
+        n_permutations = len(permutations)
+        choice_probs = np.zeros((n_permutations, n_choices))
+        while i < n_permutations:
+            n_batch = min(batch_size, n_permutations - i)
+
+            text_inputs = [context + question.get_question_permuted(perm) for perm in permutations[i:i + n_batch]]
+            last_token_probs = query_model_batch(text_inputs, tokenizer, model, context_size)
+
+            for j in range(n_batch):
+                choice_probs[i + j] = question.get_probs(tokenizer, last_token_probs[j])
+
+            i += n_batch
+
+        choice_df = pd.DataFrame(choice_codes, columns=['c' + str(i) for i in range(n_choices)])
+        probs_df = pd.DataFrame(choice_probs, columns=['p' + str(i) for i in range(n_choices)])
+
+        df = pd.concat([choice_df, probs_df], axis=1)
+        df.to_csv(save_dir + '_' + question.key + '.csv', index=False)
+
+        q = question.next_question()
+
+
+def fill_adjusted_interview(form, tokenizer, model, batch_size, context_size, save_dir, max_perms=5000):
+    """ Adjust for randomized choice ordering, questions are asked individually """
+    context = form.context
 
     q = form.first_q
     while q != 'end':
@@ -94,14 +134,7 @@ def fill_adjusted(form, tokenizer, model, batch_size, context_size, save_dir, ma
         while i < n_permutations:
             n_batch = min(batch_size, n_permutations - i)
 
-            if prompt == 'interview':
-                question_prompt = question.get_question_interview_perm(perm)
-            elif prompt == 'durmus':
-                question.get_question_durmus(perm)
-            else:
-                question_prompt = question.get_question_permuted(perm)
-
-            text_inputs = [context + question_prompt for perm in permutations[i:i + n_batch]]
+            text_inputs = [context + question.get_question_interview_perm(perm) for perm in permutations[i:i + n_batch]]
             last_token_probs = query_model_batch(text_inputs, tokenizer, model, context_size)
 
             for j in range(n_batch):
@@ -116,6 +149,89 @@ def fill_adjusted(form, tokenizer, model, batch_size, context_size, save_dir, ma
         df.to_csv(save_dir + '_' + question.key + '.csv', index=False)
 
         q = question.next_question()
+
+
+def fill_adjusted_durmus(form, tokenizer, model, batch_size, context_size, save_dir, max_perms=5000):
+    """ Adjust for randomized choice ordering, questions are asked individually """
+    context = form.context
+
+    q = form.first_q
+    while q != 'end':
+        question = form.questions[q]
+
+        # Get the permutations to be evaluated
+        n_choices = question.get_n_choices()
+        indices = [i for i in range(n_choices)]
+        if math.factorial(n_choices) <= max_perms:  # enumerate all permutations
+            permutations = list(itertools.permutations(indices))
+        else:  # sample permutations
+            permutations = [np.random.permutation(indices) for _ in range(max_perms)]
+
+        choice_codes = [question.get_choices_permuted(perm) for perm in permutations]
+
+        i = 0
+        n_permutations = len(permutations)
+        choice_probs = np.zeros((n_permutations, n_choices))
+        while i < n_permutations:
+            n_batch = min(batch_size, n_permutations - i)
+
+            text_inputs = [context + question.get_question_durmus(perm) for perm in permutations[i:i + n_batch]]
+            last_token_probs = query_model_batch(text_inputs, tokenizer, model, context_size)
+
+            for j in range(n_batch):
+                choice_probs[i + j] = question.get_probs(tokenizer, last_token_probs[j], prefix='')
+
+            i += n_batch
+
+        choice_df = pd.DataFrame(choice_codes, columns=['c' + str(i) for i in range(n_choices)])
+        probs_df = pd.DataFrame(choice_probs, columns=['p' + str(i) for i in range(n_choices)])
+
+        df = pd.concat([choice_df, probs_df], axis=1)
+        df.to_csv(save_dir + '_' + question.key + '.csv', index=False)
+
+        q = question.next_question()
+
+
+def fill_adjusted_llama2chat(form, tokenizer, model, batch_size, context_size, save_dir, max_perms=5000):
+    """ Adjust for randomized choice ordering, questions are asked individually """
+    context = form.context
+
+    q = form.first_q
+    while q != 'end':
+        question = form.questions[q]
+
+        # Get the permutations to be evaluated
+        n_choices = question.get_n_choices()
+        indices = [i for i in range(n_choices)]
+        if math.factorial(n_choices) <= max_perms:  # enumerate all permutations
+            permutations = list(itertools.permutations(indices))
+        else:  # sample permutations
+            permutations = [np.random.permutation(indices) for _ in range(max_perms)]
+
+        choice_codes = [question.get_choices_permuted(perm) for perm in permutations]
+
+        i = 0
+        n_permutations = len(permutations)
+        choice_probs = np.zeros((n_permutations, n_choices))
+        while i < n_permutations:
+            n_batch = min(batch_size, n_permutations - i)
+
+            text_inputs = [context + question.get_question_llama2chat(perm) for perm in permutations[i:i + n_batch]]
+            last_token_probs = query_model_batch(text_inputs, tokenizer, model, context_size)
+
+            for j in range(n_batch):
+                choice_probs[i + j] = question.get_probs(tokenizer, last_token_probs[j], prefix='')
+
+            i += n_batch
+
+        choice_df = pd.DataFrame(choice_codes, columns=['c' + str(i) for i in range(n_choices)])
+        probs_df = pd.DataFrame(choice_probs, columns=['p' + str(i) for i in range(n_choices)])
+
+        df = pd.concat([choice_df, probs_df], axis=1)
+        df.to_csv(save_dir + '_' + question.key + '.csv', index=False)
+
+        q = question.next_question()
+
 
 class BatchForms:
     """ Fill multiple forms (sequentially) by querying the language model in batches.
@@ -198,3 +314,49 @@ class BatchForms:
         """ Save the answers to each form as a .csv file """
         df = self.get_answers(allow_nans=allow_nans)
         df.to_csv(save_path, index=False)
+
+    def fill_interview(self, tokenizer, model):
+        """  Fill the forms sequentially by querying the language model in batches """
+        contexts = [form.context for form in self.forms]
+        current_q = [form.first_q for form in self.forms]
+
+        # Indices of the forms that have not been completely filled yet
+        not_done = [i for i in range(len(self.forms))]
+
+        ai = 0  # index of the first element in the batch being processed, points to not_done
+        while len(not_done) > 0:
+            # end of the batch
+            ai_max = min(ai + self.model_batch_size, len(not_done))
+
+            text_inputs = []
+            for i in not_done[ai:ai_max]:
+                context = contexts[i]
+                question = self.forms[i].questions[current_q[i]]
+                text_inputs.append(context + question.get_question_interview())
+
+            # Query the model and obtain the last token probabilities
+            last_token_probs = query_model_batch(text_inputs, tokenizer, model, self.model_context_size)
+
+            # Obtain the answer to each question in the batch
+            for pi, qi in enumerate(not_done[ai:ai_max]):
+                qs = self.forms[qi].questions  # relevant dictionary of questions
+                question = qs[current_q[qi]]  # current question
+                question.get_answer(tokenizer, last_token_probs[pi])
+
+                # Update the context adding the answer
+                contexts[qi] += question.print_interview()
+
+                # Skip questions until arriving to a question that should be answered
+                q = question.next_question()
+                while (q != 'end') and (not qs[q].cond(qs)):
+                    q = qs[q].next_question()
+                current_q[qi] = q
+
+            # Remove the forms that have been completely filled
+            to_remove = [ai + pi for pi, qi in enumerate(not_done[ai:ai_max]) if current_q[qi] == 'end']
+            not_done = [v for i, v in enumerate(not_done) if i not in to_remove]
+
+            # Update the index of the first element in the batch being processed
+            ai = (ai_max - len(to_remove))
+            if ai >= len(not_done):
+                ai = 0

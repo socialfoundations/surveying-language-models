@@ -1,6 +1,8 @@
 # Functions to fill the ACS form using OpenAI's API
 
 import openai
+api_key = ''
+openai.api_key = api_key
 
 import time
 import itertools
@@ -10,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_openai_logprobs(model, prompt):
+def get_openai_logprobs(model, prompt, client=None):
     """
     Inputs
     ------
@@ -22,16 +24,36 @@ def get_openai_logprobs(model, prompt):
     top_tokens: list of str, the tokens with the highest probability
     top_logprobs: list of float, the log probabilities of the top tokens
     """
-    completion = openai.Completion.create(model=model, prompt=prompt, max_tokens=1, logprobs=5)
-    logprobs = completion.choices[0].logprobs.top_logprobs[0]
-    top_tokens = list(logprobs.keys())
-    top_logprobs = list(logprobs.values())
+    if client is not None:
+        completion = client.chat.completions.create(
+            model = model,
+            messages = [
+                {'role': 'system', 'content': 'Please respond with a single letter.'},
+                {'role': 'user', 'content': prompt}
+                ],
+            max_tokens = 1,
+            temperature = 1,
+            seed = 0,
+            logprobs = True,
+            top_logprobs = 5,
+        )
+        logprobs = completion.choices[0].logprobs.content[0].top_logprobs
+        top_tokens = [logp.token for logp in logprobs]
+        top_logprobs = [logp.logprob for logp in logprobs]
+    else:
+        completion = openai.Completion.create(model=model, prompt=prompt, max_tokens=1, logprobs=5)
+        logprobs = completion.choices[0].logprobs.top_logprobs[0]
+        top_tokens = list(logprobs.keys())
+        top_logprobs = list(logprobs.values())
     return top_tokens, top_logprobs
 
 
-def get_choice_logprobs(top_tokens, top_logprobs, n_options):
+def get_choice_logprobs(top_tokens, top_logprobs, n_options, client=None):
     """ Get the logprobs corresponding to the tokens ' A', ' B', ' C', etc. """
-    options = [' ' + chr(i + 65) for i in range(n_options)]  # ' A', ' B', ' C', ...
+    if client is not None:
+        options = [chr(i + 65) for i in range(n_options)]
+    else:
+        options = [' ' + chr(i + 65) for i in range(n_options)]  # ' A', ' B', ' C', ...
     logprobs = []
     for option in options:
         if option in top_tokens:
@@ -51,8 +73,9 @@ def fill_naive(form, model_name, save_name, sleep_time=1.):
         text_input = q.get_question()
 
         # Obtain the top logprobs and the logprobs corresponding to each choice
-        top_tokens, top_logprobs = get_openai_logprobs(model_name, text_input)
-        choice_logprobs = get_choice_logprobs(top_tokens, top_logprobs, q.get_n_choices())
+        client = openai.OpenAI(api_key=api_key)
+        top_tokens, top_logprobs = get_openai_logprobs(model_name, text_input, client)
+        choice_logprobs = get_choice_logprobs(top_tokens, top_logprobs, q.get_n_choices(), client)
 
         # Register the probs for each choice
         choices = q.get_choices()
@@ -96,8 +119,9 @@ def fill_adjusted(form, model_name, save_dir, sleep_time=1.0, max_perms=50):
             text_input = question.get_question_permuted(perm)
 
             # Obtain the top logprobs and the logprobs corresponding to each choice
-            top_tokens, top_logprobs = get_openai_logprobs(model_name, text_input)
-            logprobs = get_choice_logprobs(top_tokens, top_logprobs, n_choices)
+            client = openai.OpenAI(api_key=api_key)
+            top_tokens, top_logprobs = get_openai_logprobs(model_name, text_input, client=client)
+            logprobs = get_choice_logprobs(top_tokens, top_logprobs, n_choices, client=client)
 
             # Register the probabilities
             codes = question.get_choices_permuted(perm)

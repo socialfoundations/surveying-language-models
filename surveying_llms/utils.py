@@ -22,12 +22,8 @@ def add_pad_token(tokenizer, model):
 
 
 def load_tokenizer_model(model_name):
-    if 'llama' in model_name or 'alpaca' in model_name or 'vicuna' in model_name or 'koala' in model_name:
-        tokenizer = transformers.LlamaTokenizer.from_pretrained(model_name,
-                                                               cache_dir="/tmp")
-    else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name,
-                                                               cache_dir="/tmp")
+    tokenizer = transformers.AutoTokenizer.from_pretrained(model_name,
+                                                            cache_dir="/tmp")
 
     model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
                                                               torch_dtype=torch.float16,
@@ -35,7 +31,6 @@ def load_tokenizer_model(model_name):
                                                               trust_remote_code=True,
                                                               device_map='auto')
 
-    # model.cuda()
     add_pad_token(tokenizer, model)
 
     return tokenizer, model
