@@ -1,6 +1,6 @@
 # Surveying Large Language Models
 
-Code to reproduce the experiments of the paper [Questioning the Survey Responses of Large Language Models](https://arxiv.org/abs/2306.07951).
+Code to reproduce the experiments of the NeurIPS 2024 paper [Questioning the Survey Responses of Large Language Models](https://arxiv.org/abs/2306.07951).
 
 We survey language models with the American Community Survey. The experiment results can be downloaded from 
 [here](https://keeper.mpdl.mpg.de/d/b8090e1c552d45cebb68/). 
@@ -16,10 +16,25 @@ Use the following Jupyter notebooks:
 
 ### Running the experiments
 
-The relevant files to reproduce the experiments are:
+The relevant files to reproduce the experiments in the main text are:
 
  * [script_fill_individual.py](experiments/script_fill_individual.py): obtain language models' responses to individual survey questions for language models from HugginFace's model hub.
  * [script_fill_openai.py](experiments/script_fill_openai.py): obtain GPT-3's responses to individual survey questions.
+
+ For the sequential generation experiments in the appendix, use:
  * [script_fill_sequential.py](experiments/script_fill_sequential.py): sample language models' responses to entire survey.
 questionnaires, where questions are presented sequentially while keeping previous answers in-context.
  * [discriminator_test.py](experiments/discriminator_test.py): perform the discriminator test on the model generated data.
+
+### Citation
+
+Please cite as:
+
+```
+@article{dominguez2024questioning,
+  title={Questioning the Survey Responses of Large Language Models},
+  author={Dominguez-Olmedo, Ricardo and Hardt, Moritz and Mendler-D{\"u}nner, Celestine},
+  journal={Advances in Neural Information Processing Systems},
+  year={2024}
+}
+```

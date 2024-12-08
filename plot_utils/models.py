@@ -8,12 +8,13 @@ hf_models = [
     'gptneox', 'gptneoxchat',
     'llama2-7b', 'llama2-13b', 'llama2-70b',
     'llama2-7b-chat', 'llama2-13b-chat', 'llama2-70b-chat',
+    'llama3-8b', 'llama3-70b', 'llama3-8b-instruct', 'llama3-70b-instruct',
 ]
 
 openai_models = [
     'ada', 'babbage', 'curie', 'davinci',
     'text-davinci-001', 'text-davinci-002', 'text-davinci-003',
-    'gpt-4', 'gpt-3.5-turbo', 'gpt-4-turbo-preview',
+    'gpt-4', 'gpt-3.5-turbo', 'gpt-4-turbo-preview'
 ]
 
 model_names = {
@@ -24,12 +25,14 @@ model_names = {
     'llama7b': 'LLaMA 7B', 'llama13b': 'LLaMA 13B', 'llama30b': 'LLaMA 30B', 'llama65b': 'LLaMA 65B',
     'llama2-7b': 'Llama 2 7B', 'llama2-13b': 'Llama 2 13B', 'llama2-70b': 'Llama 2 70B',
     'llama2-7b-chat': 'Llama 2 Chat 7B', 'llama2-13b-chat': 'Llama 2 Chat 13B', 'llama2-70b-chat': 'Llama 2 Chat 70B',
+    'llama3-8b': 'Llama 3 8B', 'llama3-70b': 'Llama 3 70B',
+    'llama3-8b-instruct': 'Llama 3 8B Inst', 'llama3-70b-instruct': 'Llama 3 70B Inst',
     'koala7b': 'Koala 7B', 'koala13b': 'Koala 13B',
     'vicuna7b': 'Vicuna 7B', 'vicuna13b': 'Vicuna 13B',
     'gptneox': 'GPT NeoX 20B', 'gptneoxchat': 'NeoXT Chat 20B',
     'ada': 'GPT3 2.7B', 'babbage': 'GPT3 6.7B', 'curie': 'GPT3 13B', 'davinci': 'GPT3 175B',
     'text-davinci-001': 'text-davinci-001', 'text-davinci-002': 'text-davinci-002', 'text-davinci-003': 'text-davinci-003',
-    'gpt-4': 'GPT-4 0613', 'gpt-3.5-turbo': 'GPT 3.5 Turbo 0613', 'gpt-4-turbo-preview': 'GPT-4 Turbo 0125',
+    'gpt-4': 'GPT-4 0613', 'gpt-4-turbo': 'GPT 4 Turbo', 'gpt-3.5-turbo': 'GPT 3.5 Turbo 0613', 'gpt-4-turbo-preview': 'GPT-4 Turbo 0125',
     'uniform': 'Uniform\ndistribution', 'census': 'U.S. census'
 }
 
@@ -41,6 +44,8 @@ model_sizes = {  # in billions of parameters
     'llama7b': 7, 'llama13b': 13, 'llama30b': 30, 'llama65b': 65,
     'llama2-7b': 7.3, 'llama2-13b': 13.3, 'llama2-70b': 70,
     'llama2-7b-chat': 7.4, 'llama2-13b-chat': 13.4, 'llama2-70b-chat': 70.1,
+    'llama3-8b': 8, 'llama3-70b': 71,
+    'llama3-8b-instruct': 8.1, 'llama3-70b-instruct': 72,
     'koala7b': 7.1, 'koala13b': 13.1, 'vicuna7b': 7.2, 'vicuna13b': 13.2,
     'gptneox': 20, 'gptneoxchat': 20,
     'ada': 2.7, 'babbage': 6.7, 'curie':13, 'davinci': 174.7,
@@ -58,6 +63,7 @@ instruct = {
     'koala7b': 'llama7b', 'vicuna7b': 'llama7b',
     'koala13b': 'llama13b', 'vicuna13b': 'llama13b',
     'llama2-7b-chat': 'llama2-7b', 'llama2-13b-chat': 'llama2-13b', 'llama2-70b-chat': 'llama2-70b',
+    'llama3-8b-instruct': 'llama3-8b', 'llama3-70b-instruct': 'llama3-70b',
     'gptneoxchat': 'gptneox',
     'text-davinci-001': 'davinci', 'text-davinci-002':'davinci', 'text-davinci-003': 'davinci',
     'gpt-4': 'davinci', 'gpt-3.5-turbo': 'davinci',  # not correct

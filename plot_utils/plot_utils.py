@@ -70,8 +70,8 @@ def load_acs_state_responses(census_file, n_categories):
     return states, responses_states
 
 
-def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes):
-    _, ax = plt.subplots(1, 3, figsize=(5.5, 1.5), sharey=True)
+def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes, figsize=(9, 1.5)):
+    _, ax = plt.subplots(1, 5, figsize=figsize, sharey=True)
 
     u = census_norm_entropies['SEX']
     ax[0].plot([1e7, 1e12], [u - 0.015, u - 0.015], c=gcolor)  # -0.015 to avoid overlap with uniform
@@ -79,12 +79,16 @@ def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes):
     ax[1].plot([1e7, 1e12], [u, u], c=gcolor)
     u = census_norm_entropies['FER']
     ax[2].plot([1e7, 1e12], [u, u], c=gcolor)
+    u = census_norm_entropies['CIT']
+    ax[3].plot([1e7, 1e12], [u, u], c=gcolor)
+    u = census_norm_entropies['ENG']
+    ax[4].plot([1e7, 1e12], [u, u], c=gcolor)
 
     msize = 4
 
-    plot_vars = ['SEX', 'HICOV', 'FER']
+    plot_vars = ['SEX', 'HICOV', 'FER', 'CIT', 'ENG']
     sizes = [model_sizes[m] for m in base_models]
-    for i in range(3):
+    for i in range(5):
         entropies = [model_entropies[plot_vars[i]][m] for m in base_models]
         ax[i].plot(sizes, entropies, 'D', c=bcolor, markersize=msize, zorder=10)
         ax[i].plot([1e7, 1e12], [1, 1], c=ocolor)  # uniform line
@@ -97,17 +101,16 @@ def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes):
         ax[i].grid()
         ax[i].xaxis.set_ticks_position('none')
         ax[i].yaxis.set_ticks_position('none')
-        #     for spine in ax[i].spines.values():
-        #         spine.set_edgecolor('0.7')
         for spine in ax[i].spines.values():
             spine.set_edgecolor('0.3')
 
-    # ax[0].set_ylabel('Entropy of\nmodel rresponses', fontsize=12)
     ax[0].set_ylabel('Response entropy', fontsize=12, labelpad=5, y=0.5)
 
     ax[0].set_title('SEX')
     ax[1].set_title('HICOV')
     ax[2].set_title('FER')
+    ax[3].set_title('CIT')
+    ax[4].set_title('ENG')
 
     legend_elements = []
     legend_elements.append(plt.Line2D([0], [0], marker='D', color=bcolor,
@@ -119,31 +122,32 @@ def figure_1(model_entropies, census_norm_entropies, base_models, model_sizes):
     legend_elements.append(plt.Line2D([0], [0], color=ocolor,
                                     label='Uniform distribution', markersize=msize + 1,
                                     markerfacecolor=ocolor, lw=2))
-    legend_position = (-0.64, -0.38)
-    ax[-1].legend(handles=legend_elements, loc='upper center',
+    legend_position = (0.5, -0.38)
+    ax[2].legend(handles=legend_elements, loc='upper center',
                 bbox_to_anchor=legend_position, frameon=False, ncols=3, 
-    #               handletextpad=0.8,
                 fontsize=10.5, columnspacing=1.1,)
 
     plt.subplots_adjust(wspace=0.1)
 
-def plot_a_bias(a_bias, base_models, model_names, alpha=0.4, figsize=(9, 1.5)):
+
+def plot_a_bias(a_bias, base_models, model_names, alpha=0.4, figsize=(9, 1.5), legendy=1.2, fontsize=12):
     fig, ax = plt.subplots(figsize=figsize)
 
     # plot the a-bias of each model
     for i, model in enumerate(base_models):
+        color = rcolor if i == 0 or i == len(base_models)-1 else bcolor
         ys = a_bias[model]
         xs = [i for _ in ys]
-        ax.plot(xs, ys, '.', c=bcolor, alpha=alpha, markersize=12)
+        ax.plot(xs, ys, '.', c=color, alpha=alpha, markersize=12)
 
     # legend
     legend_elements = []
     legend_elements.append(plt.Line2D([0], [0], marker='.', color=bcolor,
                                       label='Survey question', markersize=11,
                                       markerfacecolor=bcolor, lw=0))
-    legend_position = (1.0, 1.2)  # Coordinates (x, y) for top left position
+    legend_position = (1.0, legendy)  # Coordinates (x, y) for top left position
     ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, ncols=3, handletextpad=.6, )
+              bbox_to_anchor=legend_position, frameon=False, ncols=3, handletextpad=.6, fontsize=fontsize)
 
     # x-axis
     dx = 0.2
@@ -153,7 +157,7 @@ def plot_a_bias(a_bias, base_models, model_names, alpha=0.4, figsize=(9, 1.5)):
         label.set_transform(label.get_transform() + offset)
     ax.set_xticks([i for i in range(len(base_models))])
     labels = [model_names[m] for m in base_models]
-    ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
+    ax.set_xticklabels(labels, rotation=32, ha='right', fontsize=fontsize)
     ax.set_xlim([-0.4, len(base_models) - 0.5])
 
     ax.xaxis.set_ticks_position('none')
@@ -162,12 +166,18 @@ def plot_a_bias(a_bias, base_models, model_names, alpha=0.4, figsize=(9, 1.5)):
     # y-axis
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.set_axisbelow(True)
-    ax.set_ylabel('A-bias', fontsize=12)
-    ax.tick_params(axis='y', which='both', labelsize=10)
+    ax.set_ylabel('A-bias', fontsize=fontsize+2)
+    ax.tick_params(axis='y', which='both', labelsize=fontsize)
+
+    return ax
+
 
 def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_names, figsize, 
-                          alpha=0.4, ylegend=1.2):
-    fig, ax = plt.subplots(figsize=figsize)
+                          alpha=0.4, ylegend=1.2, fontsize=12, fig_ax=None):
+    if fig_ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig, ax = fig_ax
 
     # plot the entropy of each model
     for i, model in enumerate(models):
@@ -189,10 +199,6 @@ def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_
     legend_elements.append(plt.Line2D([0], [0], marker='.', color=gcolor,
                                       label='Survey question', markersize=14,
                                       markerfacecolor=gcolor, lw=0))
-#     legend_position = (1.015, 1.3)  # Coordinates (x, y) for top left position
-    legend_position = (1.015, ylegend)  # Coordinates (x, y) for top left position
-    ax.legend(handles=legend_elements, loc='upper right',
-              bbox_to_anchor=legend_position, frameon=False, handletextpad=-0.1, ncols=2, columnspacing=-0.7)
 
     # x-ticks
     dx = 0.2;
@@ -204,25 +210,30 @@ def plot_adjusted_entropy(entropies, census_entropies, models, variables, model_
     if census_entropies is not None:
         labels.append('U.S. Census')
     ax.set_xticks([i for i in range(len(labels))])
-    ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
+    ax.set_xticklabels(labels, rotation=35, ha='right', fontsize=fontsize)
     ax.set_yticks([0.0, 0.5, 1.0])
     ax.set_xlim([-0.4, len(labels) - 0.5])
 
     ax.yaxis.set_ticks_position('none')
 
-    # ax.grid('x', zorder=-10)
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.set_axisbelow(True)
     ax.set_ylim([0, 1.1])
-    ax.set_ylabel('Response entropy', fontsize=12, labelpad=5, y=0.5)
+    ax.set_ylabel('Response entropy', fontsize=fontsize+1, labelpad=5, y=0.5)
+
 
 def plot_divergence_subgroups(divergence, divergence_uniform, divergence_census,
                               selected_models, model_names, alpha=0.1,
                               ylim=[-0.1, 2.], yticks=[0., 0.5, 1., 1.5, 2.],
                               ylabel=r'$\bar\mathrm{KL}$(model, Ref.)', clabel='Census subgroup',
-                              figsize=(13, 1.5)):
-    fig, ax = plt.subplots(figsize=figsize)
+                              figsize=(13, 1.5), plot_legend=False, legend_position=(1.01, 1.32),
+                              fontsize=12, fig_ax=None):
+
+    if fig_ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig, ax = fig_ax
 
     # divergence for each model
     for i, model in enumerate(selected_models):
@@ -236,19 +247,16 @@ def plot_divergence_subgroups(divergence, divergence_uniform, divergence_census,
         
 
     # legend
-#     legend_elements = []
-#     legend_elements.append(plt.Line2D([0], [0], marker='o', color=bcolor,
-#                                       label='U.S. state populations', markersize=6,
-#                                       markerfacecolor=bcolor, lw=0))
-#     legend_elements.append(plt.Line2D([0], [0], marker='x', color='k',
-#                                       label='Entire U.S. census', markersize=7,
-#                                       markerfacecolor='k', lw=0))
-#     legend_elements.append(plt.Line2D([0], [0], marker='*', color=rcolor,
-#                                       label='Uniform responses', markersize=9,
-#                                       markerfacecolor=rcolor, lw=0))
-#     legend_position = (1.01, 1.32)  # Coordinates (x, y) for top left position
-#     ax.legend(handles=legend_elements, loc='upper right',
-#               bbox_to_anchor=legend_position, frameon=False, handletextpad=0.4, ncols=4, fontsize=10.5)
+    if plot_legend:
+        legend_elements = []
+        legend_elements.append(plt.Line2D([0], [0], marker='o', color=bcolor,
+                                        label='U.S. states', markersize=6,
+                                        markerfacecolor=bcolor, lw=0))
+        legend_elements.append(plt.Line2D([0], [0], marker='*', color=rcolor,
+                                        label='Uniform responses', markersize=9,
+                                        markerfacecolor=rcolor, lw=0))
+        ax.legend(handles=legend_elements, loc='upper right',
+                bbox_to_anchor=legend_position, frameon=False, handletextpad=0.4, ncols=4, fontsize=10.5)
 
     # x-ticks
     dx = 0.2;
@@ -258,16 +266,16 @@ def plot_divergence_subgroups(divergence, divergence_uniform, divergence_census,
         label.set_transform(label.get_transform() + offset)
     ax.set_xticks([i for i in range(len(selected_models))])
     labels = [model_names[m] for m in selected_models]
-    ax.set_xticklabels(labels, rotation=25, ha='right', fontsize=10)
+    ax.set_xticklabels(labels, rotation=32, ha='right', fontsize=fontsize)
 
     ax.set_xlim([-0.4, len(selected_models) - 0.5])
-#     ax.set_ylim(ylim)
     ax.set_yticks(yticks)
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey', zorder=-10)
     ax.set_axisbelow(True)
-    ax.set_ylabel(ylabel, fontsize=12)
+    ax.set_ylabel(ylabel, fontsize=fontsize+1)
     ax.tick_params(axis='y', which='both', labelsize=10)
+    return ax
 
 
 def plot_discriminator(accuracies, accuracies2, models, model_names, 
@@ -349,7 +357,7 @@ def plot_discriminator(accuracies, accuracies2, models, model_names,
 
 def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent, models, model_names,
                              xlabel='Entropy of subgroup\'s (U.S. state) responses', 
-                             ylabel=r'$\bar{\mathrm{KL}}$(model, subgroup)',
+                             ylabel=r"$\bar{\mathrm{KL}}$(model, subgroup)",
                              title1='Unadjusted responses', title2='Adjusted responses',
                              figsize=(5.5, 2.5)):
     from matplotlib.legend_handler import HandlerTuple, HandlerLine2D
@@ -435,14 +443,8 @@ def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent,
 
     plt.subplots_adjust(wspace=0.05)
 
-
-def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent, models, model_names,
-                             xlabel='Entropy of subgroup\'s (U.S. state) responses', 
-                             ylabel=r"$\bar{\mathrm{KL}}$(model, subgroup)",
-                             title1='Unadjusted responses', title2='Adjusted responses',
-                             figsize=(5.5, 2.5)):
-    from matplotlib.legend_handler import HandlerTuple, HandlerLine2D
-    fig, axs = plt.subplots(1, 2, figsize=figsize, sharey=True, sharex=True)
+def alignment_entropy_plot(divergence, divergence_unadj, models, states, subgroup_ent, model_names):
+    fig, axs = plt.subplots(1, 2, figsize=(5.5, 2.5), sharey=True, sharex=True)
 
     ax = axs[0]
     p = sb.color_palette("colorblind")
@@ -456,15 +458,15 @@ def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent,
         f = np.poly1d(np.polyfit(xaxis, yaxis, 1))
         ax.plot(x_range, f(x_range), '', c=c, linewidth=2.)
 
-    ax.set_ylabel(ylabel, fontsize=12)
-    ax.set_title(title1)
+    ax.set_ylabel(r'$\bar{\mathrm{KL}}$(model, subgroup)', fontsize=12)
+    ax.set_title('Unadjusted responses')
     ax.xaxis.set_ticks_position('none')
+    ax.xaxis.set_ticks([0.45, 0.5, 0.55, 0.6])
     ax.grid()
 
     ax = axs[1]
     p = sb.color_palette("colorblind")
 
-    # xaxis = list(subgroup_unif_mean.values())
     x_range = [min(xaxis), max(xaxis)]
     for c, m in zip(p, models):
         yaxis = [divergence[m][s] for s in states]
@@ -485,11 +487,6 @@ def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent,
                                       markerfacecolor='k', lw=3))
     labels_.append('Trendline')
 
-    legend_elements.append(plt.Line2D([0], [0], color='w', alpha=0.7,
-                                      markersize=11,
-                                      markerfacecolor='w', lw=3))
-    labels_.append('')
-
     # lines with the names
     for c, m in zip(p, models):
         # dots
@@ -506,8 +503,8 @@ def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent,
 
 
     legend_labels = [(line, line), (line, line)]
-    legend = ax.legend(legend_labels, ['Combined Data 1', 'Combined Data 2'], 
-                       handler_map={tuple: HandlerTuple(ndivide=None)})
+    from matplotlib.legend_handler import HandlerTuple, HandlerLine2D
+    legend = ax.legend(legend_labels, ['Combined Data 1', 'Combined Data 2'], handler_map={tuple: HandlerTuple(ndivide=None)})
 
     legend_position = (1.08, -.2)  # Coordinates (x, y) for top left position
     ax.legend(legend_elements, labels_, loc='upper right',
@@ -515,8 +512,8 @@ def plot_similarity_opinions(states, divergence_unadj, divergence, subgroup_ent,
               handler_map={tuple: HandlerTuple(ndivide=None), 
                            type(line): HandlerLine2D()})
 
-    ax.set_xlabel(xlabel, fontsize=11.8)
-    ax.set_title(title2)
+    ax.set_xlabel('Entropy of subgroup (U.S. state) responses', fontsize=11.8)
+    ax.set_title('Adjusted responses')
     ax.xaxis.set_ticks_position('none')
     ax.yaxis.set_ticks_position('none')
     ax.xaxis.set_label_coords(-0.1, -.14)
